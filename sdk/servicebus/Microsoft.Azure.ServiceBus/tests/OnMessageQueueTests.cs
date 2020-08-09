@@ -3,9 +3,11 @@
 
 namespace Microsoft.Azure.ServiceBus.UnitTests
 {
+    using Microsoft.Azure.ServiceBus.Core;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Threading;
     using System.Threading.Tasks;
     using Xunit;
 
@@ -19,6 +21,106 @@ namespace Microsoft.Azure.ServiceBus.UnitTests
             new object[] { true, false, 1 },
             new object[] { true, false, 10 },
         };
+
+        private Task ExceptionReceivedHandler(ExceptionReceivedEventArgs eventArgs)
+        {
+            TestUtility.Log($"Exception Received: ClientId: {eventArgs.ExceptionReceivedContext.ClientId}, EntityPath: {eventArgs.ExceptionReceivedContext.EntityPath}, Exception: {eventArgs.Exception.Message}");
+            return Task.CompletedTask;
+        }
+
+        [Fact]
+        async Task Test()
+        {
+            try
+            {
+                RandomF();
+                Console.WriteLine("in try");
+                //throw new Exception("hello");
+                return;
+            }
+            catch
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1));
+                Console.WriteLine("in catch");
+                return; 
+            }
+            finally
+            {
+                Console.WriteLine("in finally");
+            }
+
+            await Task.Delay(TimeSpan.FromSeconds(1));
+            Console.WriteLine("after the try-catch-finally block");
+        }
+
+
+        private void RandomF()
+        {
+            System.Random random = new System.Random();
+            int num = random.Next();
+            if (num > 0)
+            {
+                Console.WriteLine("not throw");
+            }
+            else
+            {
+                throw new Exception("hello");
+            }
+        }
+
+        [Fact]
+        public async Task Unregister()
+        {
+            var messageCount = 10;
+            var messageSender = new MessageSender("Endpoint=sb://contoso.servicebus.onebox.windows-int.net/;SharedAccessKeyName=DefaultNamespaceSasAllKeyName;SharedAccessKey=8864/auVd3qDC75iTjBL1GJ4D2oXC6bIttRd0jzDZ+g=", "unregister");
+            var messageReceiver = new MessageReceiver("Endpoint=sb://contoso.servicebus.onebox.windows-int.net/;SharedAccessKeyName=DefaultNamespaceSasAllKeyName;SharedAccessKey=8864/auVd3qDC75iTjBL1GJ4D2oXC6bIttRd0jzDZ+g=", "unregister");
+
+            var count = 0;
+            await TestUtility.SendMessagesAsync(messageSender, messageCount);
+            messageReceiver.RegisterMessageHandler(
+                async (message, token) =>
+                {
+                    TestUtility.Log($"Received message: SequenceNumber: {message.SystemProperties.SequenceNumber}");
+                    Interlocked.Increment(ref count);
+                    if (messageReceiver.ReceiveMode == ReceiveMode.PeekLock)
+                    {
+                        await messageReceiver.CompleteAsync(message.SystemProperties.LockToken);
+                    }
+                },
+                new MessageHandlerOptions(ExceptionReceivedHandler) { MaxConcurrentCalls = 3, AutoComplete = false });
+
+            // Wait for the OnMessage Tasks to finish
+            var stopwatch = Stopwatch.StartNew();
+            while (stopwatch.Elapsed.TotalSeconds <= 60)
+            {
+                if (count == messageCount)
+                {
+                    TestUtility.Log($"All '{messageCount}' messages Received.");
+                    break;
+                }
+                await Task.Delay(TimeSpan.FromSeconds(5));
+            }
+            Assert.True(count == messageCount);
+
+            // Unregister the message handler and the receive should not happen
+            await messageReceiver.UnregisterMessageHandler();
+            //await Task.Delay(TimeSpan.FromMinutes(3));
+            await TestUtility.SendMessagesAsync(messageSender, messageCount);
+
+            stopwatch = Stopwatch.StartNew();
+            count = 0;
+            while (stopwatch.Elapsed.TotalSeconds <= 60)
+            {
+                if (count == messageCount)
+                {
+                    TestUtility.Log($"All '{messageCount}' messages Received.");
+                    break;
+                }
+                await Task.Delay(TimeSpan.FromSeconds(5));
+            }
+            Console.WriteLine("COUNT: ", count);
+            //Assert.True(count == 0);
+        }
 
         [Theory]
         [MemberData(nameof(TestPermutations))]

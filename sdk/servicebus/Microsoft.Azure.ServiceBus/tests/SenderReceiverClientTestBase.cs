@@ -273,6 +273,25 @@ namespace Microsoft.Azure.ServiceBus.UnitTests
                 await Task.Delay(TimeSpan.FromSeconds(5));
             }
             Assert.True(count == messageCount);
+
+            // Unregister the message handler and the receive should not happen
+            await messageReceiver.UnregisterMessageHandler();
+            //await Task.Delay(TimeSpan.FromMinutes(3));
+            await TestUtility.SendMessagesAsync(messageSender, messageCount);
+
+            stopwatch = Stopwatch.StartNew();
+            count = 0;
+            while (stopwatch.Elapsed.TotalSeconds <= 60)
+            {
+                if (count == messageCount)
+                {
+                    TestUtility.Log($"All '{messageCount}' messages Received.");
+                    break;
+                }
+                await Task.Delay(TimeSpan.FromSeconds(5));
+            }
+            Console.WriteLine("COUNT: ", count);
+            Assert.True(count == 0);
         }
 
         internal async Task OnMessageRegistrationWithoutPendingMessagesTestCase(

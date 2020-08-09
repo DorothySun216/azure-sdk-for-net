@@ -19,6 +19,7 @@ namespace Microsoft.Azure.ServiceBus
         readonly CancellationToken pumpCancellationToken;
         readonly SemaphoreSlim maxConcurrentCallsSemaphoreSlim;
         readonly ServiceBusDiagnosticSource diagnosticSource;
+        public bool messagePumpCancelled;
 
         public MessageReceivePump(IMessageReceiver messageReceiver,
             MessageHandlerOptions registerHandlerOptions,
@@ -33,6 +34,7 @@ namespace Microsoft.Azure.ServiceBus
             this.pumpCancellationToken = pumpCancellationToken;
             this.maxConcurrentCallsSemaphoreSlim = new SemaphoreSlim(this.registerHandlerOptions.MaxConcurrentCalls);
             this.diagnosticSource = new ServiceBusDiagnosticSource(messageReceiver.Path, endpoint);
+            this.messagePumpCancelled = false;
         }
 
         public void StartPump()
@@ -122,6 +124,8 @@ namespace Microsoft.Azure.ServiceBus
                     await this.RaiseExceptionReceived(exception, ExceptionReceivedEventArgsAction.Receive).ConfigureAwait(false);
                 }
             }
+
+            this.messagePumpCancelled = true;
         }
 
         async Task MessageDispatchTaskInstrumented(Message message)

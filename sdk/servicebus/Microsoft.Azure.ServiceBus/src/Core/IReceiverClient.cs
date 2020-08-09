@@ -66,7 +66,7 @@ namespace Microsoft.Azure.ServiceBus.Core
         /// <summary>
         /// Unregister messgae hander from the receiver if there is active message handler registered. 
         /// </summary>
-        void UnregisterMessageHandler();
+        Task UnregisterMessageHandler();
 
         /// <summary>
         /// Completes a <see cref="Message"/> using its lock token. This will delete the message from the queue.
