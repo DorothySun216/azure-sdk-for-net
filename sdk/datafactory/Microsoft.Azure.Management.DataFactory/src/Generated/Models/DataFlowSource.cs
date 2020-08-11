@@ -32,10 +32,18 @@ namespace Microsoft.Azure.Management.DataFactory.Models
         /// <param name="name">Transformation name.</param>
         /// <param name="description">Transformation description.</param>
         /// <param name="dataset">Dataset reference.</param>
-        public DataFlowSource(string name, string description = default(string), DatasetReference dataset = default(DatasetReference))
+        /// <param name="linkedService">Linked service reference.</param>
+        /// <param name="schemaLinkedService">Schema linked service
+        /// reference.</param>
+        /// <param name="staging">Staging info for execute data flow
+        /// activity.</param>
+        public DataFlowSource(string name, string description = default(string), DatasetReference dataset = default(DatasetReference), LinkedServiceReference linkedService = default(LinkedServiceReference), LinkedServiceReference schemaLinkedService = default(LinkedServiceReference), DataFlowStagingInfo staging = default(DataFlowStagingInfo))
             : base(name, description)
         {
             Dataset = dataset;
+            LinkedService = linkedService;
+            SchemaLinkedService = schemaLinkedService;
+            Staging = staging;
             CustomInit();
         }
 
@@ -51,6 +59,24 @@ namespace Microsoft.Azure.Management.DataFactory.Models
         public DatasetReference Dataset { get; set; }
 
         /// <summary>
+        /// Gets or sets linked service reference.
+        /// </summary>
+        [JsonProperty(PropertyName = "linkedService")]
+        public LinkedServiceReference LinkedService { get; set; }
+
+        /// <summary>
+        /// Gets or sets schema linked service reference.
+        /// </summary>
+        [JsonProperty(PropertyName = "schemaLinkedService")]
+        public LinkedServiceReference SchemaLinkedService { get; set; }
+
+        /// <summary>
+        /// Gets or sets staging info for execute data flow activity.
+        /// </summary>
+        [JsonProperty(PropertyName = "staging")]
+        public DataFlowStagingInfo Staging { get; set; }
+
+        /// <summary>
         /// Validate the object.
         /// </summary>
         /// <exception cref="Rest.ValidationException">
@@ -62,6 +88,18 @@ namespace Microsoft.Azure.Management.DataFactory.Models
             if (Dataset != null)
             {
                 Dataset.Validate();
+            }
+            if (LinkedService != null)
+            {
+                LinkedService.Validate();
+            }
+            if (SchemaLinkedService != null)
+            {
+                SchemaLinkedService.Validate();
+            }
+            if (Staging != null)
+            {
+                Staging.Validate();
             }
         }
     }

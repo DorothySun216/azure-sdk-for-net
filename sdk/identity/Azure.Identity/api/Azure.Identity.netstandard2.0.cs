@@ -13,6 +13,19 @@ namespace Azure.Identity
         public override Azure.Core.AccessToken GetToken(Azure.Core.TokenRequestContext requestContext, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
         public override System.Threading.Tasks.ValueTask<Azure.Core.AccessToken> GetTokenAsync(Azure.Core.TokenRequestContext requestContext, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
     }
+    public static partial class AzureAuthorityHosts
+    {
+        public static System.Uri AzureChina { get { throw null; } }
+        public static System.Uri AzureGermany { get { throw null; } }
+        public static System.Uri AzureGovernment { get { throw null; } }
+        public static System.Uri AzurePublicCloud { get { throw null; } }
+    }
+    public partial class AzureCliCredential : Azure.Core.TokenCredential
+    {
+        public AzureCliCredential() { }
+        public override Azure.Core.AccessToken GetToken(Azure.Core.TokenRequestContext requestContext, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
+        public override System.Threading.Tasks.ValueTask<Azure.Core.AccessToken> GetTokenAsync(Azure.Core.TokenRequestContext requestContext, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
+    }
     public partial class ChainedTokenCredential : Azure.Core.TokenCredential
     {
         public ChainedTokenCredential(params Azure.Core.TokenCredential[] sources) { }
@@ -57,10 +70,14 @@ namespace Azure.Identity
         public bool ExcludeInteractiveBrowserCredential { get { throw null; } set { } }
         public bool ExcludeManagedIdentityCredential { get { throw null; } set { } }
         public bool ExcludeSharedTokenCacheCredential { get { throw null; } set { } }
+        public bool ExcludeVisualStudioCodeCredential { get { throw null; } set { } }
+        public bool ExcludeVisualStudioCredential { get { throw null; } set { } }
         public string InteractiveBrowserTenantId { get { throw null; } set { } }
         public string ManagedIdentityClientId { get { throw null; } set { } }
         public string SharedTokenCacheTenantId { get { throw null; } set { } }
         public string SharedTokenCacheUsername { get { throw null; } set { } }
+        public string VisualStudioCodeTenantId { get { throw null; } set { } }
+        public string VisualStudioTenantId { get { throw null; } set { } }
     }
     public partial class DeviceCodeCredential : Azure.Core.TokenCredential
     {
@@ -98,13 +115,6 @@ namespace Azure.Identity
         public override Azure.Core.AccessToken GetToken(Azure.Core.TokenRequestContext requestContext, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
         public override System.Threading.Tasks.ValueTask<Azure.Core.AccessToken> GetTokenAsync(Azure.Core.TokenRequestContext requestContext, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
     }
-    public static partial class KnownAuthorityHosts
-    {
-        public static readonly System.Uri AzureChinaCloud;
-        public static readonly System.Uri AzureCloud;
-        public static readonly System.Uri AzureGermanCloud;
-        public static readonly System.Uri AzureUSGovernment;
-    }
     public partial class ManagedIdentityCredential : Azure.Core.TokenCredential
     {
         protected ManagedIdentityCredential() { }
@@ -138,5 +148,29 @@ namespace Azure.Identity
         public UsernamePasswordCredential(string username, string password, string tenantId, string clientId, Azure.Identity.TokenCredentialOptions options) { }
         public override Azure.Core.AccessToken GetToken(Azure.Core.TokenRequestContext requestContext, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
         public override System.Threading.Tasks.ValueTask<Azure.Core.AccessToken> GetTokenAsync(Azure.Core.TokenRequestContext requestContext, System.Threading.CancellationToken cancellationToken = default(System.Threading.CancellationToken)) { throw null; }
+    }
+    public partial class VisualStudioCodeCredential : Azure.Core.TokenCredential
+    {
+        public VisualStudioCodeCredential() { }
+        public VisualStudioCodeCredential(Azure.Identity.VisualStudioCodeCredentialOptions options) { }
+        public override Azure.Core.AccessToken GetToken(Azure.Core.TokenRequestContext requestContext, System.Threading.CancellationToken cancellationToken) { throw null; }
+        public override System.Threading.Tasks.ValueTask<Azure.Core.AccessToken> GetTokenAsync(Azure.Core.TokenRequestContext requestContext, System.Threading.CancellationToken cancellationToken) { throw null; }
+    }
+    public partial class VisualStudioCodeCredentialOptions : Azure.Identity.TokenCredentialOptions
+    {
+        public VisualStudioCodeCredentialOptions() { }
+        public string TenantId { get { throw null; } set { } }
+    }
+    public partial class VisualStudioCredential : Azure.Core.TokenCredential
+    {
+        public VisualStudioCredential() { }
+        public VisualStudioCredential(Azure.Identity.VisualStudioCredentialOptions options) { }
+        public override Azure.Core.AccessToken GetToken(Azure.Core.TokenRequestContext requestContext, System.Threading.CancellationToken cancellationToken) { throw null; }
+        public override System.Threading.Tasks.ValueTask<Azure.Core.AccessToken> GetTokenAsync(Azure.Core.TokenRequestContext requestContext, System.Threading.CancellationToken cancellationToken) { throw null; }
+    }
+    public partial class VisualStudioCredentialOptions : Azure.Identity.TokenCredentialOptions
+    {
+        public VisualStudioCredentialOptions() { }
+        public string TenantId { get { throw null; } set { } }
     }
 }
