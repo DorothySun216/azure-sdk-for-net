@@ -914,21 +914,19 @@ namespace Microsoft.Azure.ServiceBus.Core
             MessagingEventSource.Log.UnregisterMessageHandlerStart(this.ClientId);
             lock (this.messageReceivePumpSyncLock)
             {
-                if (this.receivePump != null)
+                if(this.receivePump == null || this.receivePumpCancellationTokenSource.IsCancellationRequested)
                 {
-                    this.receivePumpCancellationTokenSource.Cancel();
-                    this.receivePumpCancellationTokenSource.Dispose();
-                    //this.receivePump = null;
+                    return;
                 }
-                else
-                {
-                    throw new InvalidOperationException(Resources.MessageHandlerNotRegisteredYet);
-                }
+
+                this.receivePumpCancellationTokenSource.Cancel();
+                this.receivePumpCancellationTokenSource.Dispose();
             }
 
-            while (this.receivePump != null && this.receivePump.messagePumpCancelled)
+            while (this.receivePump != null 
+                && this.receivePump.maxConcurrentCallsSemaphoreSlim.CurrentCount < this.receivePump.registerHandlerOptions.MaxConcurrentCalls)
             {
-                await Task.Delay(TimeSpan.FromSeconds(5));
+                await Task.Delay(10);
             }
 
             lock (this.messageReceivePumpSyncLock)

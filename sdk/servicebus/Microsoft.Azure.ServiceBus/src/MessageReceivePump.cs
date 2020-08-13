@@ -14,10 +14,10 @@ namespace Microsoft.Azure.ServiceBus
     {
         readonly Func<Message, CancellationToken, Task> onMessageCallback;
         readonly string endpoint;
-        readonly MessageHandlerOptions registerHandlerOptions;
+        public readonly MessageHandlerOptions registerHandlerOptions;
         readonly IMessageReceiver messageReceiver;
         readonly CancellationToken pumpCancellationToken;
-        readonly SemaphoreSlim maxConcurrentCallsSemaphoreSlim;
+        public readonly SemaphoreSlim maxConcurrentCallsSemaphoreSlim;
         readonly ServiceBusDiagnosticSource diagnosticSource;
         public bool messagePumpCancelled;
 
@@ -124,8 +124,6 @@ namespace Microsoft.Azure.ServiceBus
                     await this.RaiseExceptionReceived(exception, ExceptionReceivedEventArgsAction.Receive).ConfigureAwait(false);
                 }
             }
-
-            this.messagePumpCancelled = true;
         }
 
         async Task MessageDispatchTaskInstrumented(Message message)
