@@ -12,7 +12,27 @@ namespace Microsoft.Azure.ServiceBus.UnitTests
     using Xunit;
 
     public class MessageTests
-    {
+    {   
+        [Fact]
+        public async Task prefetch()
+        {
+            var queueName = "secondprefetch";
+            var queueClient = new QueueClient("Endpoint=sb://contoso.servicebus.onebox.windows-int.net/;SharedAccessKeyName=DefaultNamespaceSasAllKeyName;SharedAccessKey=8864/auVd3qDC75iTjBL1GJ4D2oXC6bIttRd0jzDZ+g=", queueName, ReceiveMode.PeekLock);
+            queueClient.PrefetchCount = 5;
+            // no message in the queue yet, lock duration is 5 min
+            var message = await queueClient.InnerReceiver.ReceiveAsync(1, TimeSpan.FromSeconds(30));
+            //await Task.Delay(TimeSpan.FromSeconds(40));
+            //Assert.True(message == null);
+
+            // send 5 messgaes
+            for (int i = 0; i < 5; i++)
+            {
+                await queueClient.SendAsync(new Message(i.ToString().GetBytes()));
+            }
+            await Task.Delay(TimeSpan.FromSeconds(10));
+            await queueClient.CloseAsync();
+        }
+
         [Fact]
         [DisplayTestMethodName]
         public void TestClone()
